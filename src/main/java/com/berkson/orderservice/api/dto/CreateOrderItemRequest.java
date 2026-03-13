@@ -1,4 +1,11 @@
 package com.berkson.orderservice.api.dto;
 
-public record CreateOrderItemRequest() {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
+public record CreateOrderItemRequest(
+        @NotNull UUID productId,
+        @Min(1) int quantity) {
 }
