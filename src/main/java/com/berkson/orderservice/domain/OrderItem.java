@@ -24,6 +24,12 @@ public class OrderItem {
     @Column(nullable = false)
     private UUID productId;
 
+    @Column(nullable = false, length = 64)
+    private String productSku;
+
+    @Column(nullable = false, length = 160)
+    private String productName;
+
     @Column(nullable = false)
     private int quantity;
 

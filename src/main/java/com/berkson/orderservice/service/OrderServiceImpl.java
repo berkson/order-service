@@ -5,14 +5,13 @@ import com.berkson.orderservice.api.dto.OrderItemResponse;
 import com.berkson.orderservice.api.dto.OrderResponse;
 import com.berkson.orderservice.domain.Order;
 import com.berkson.orderservice.domain.OrderItem;
-import com.berkson.orderservice.exception.CustomerBlockedException;
-import com.berkson.orderservice.exception.OrderNotFoundException;
-import com.berkson.orderservice.exception.ProductInactiveException;
+import com.berkson.orderservice.exception.*;
 import com.berkson.orderservice.integration.catalog.CatalogClient;
 import com.berkson.orderservice.integration.catalog.ProductDto;
 import com.berkson.orderservice.integration.customer.CustomerClient;
 import com.berkson.orderservice.integration.customer.CustomerDto;
 import com.berkson.orderservice.repository.OrderRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrderResponse create(CreateOrderRequest req) {
-        CustomerDto customer = customerClient.getById(req.customerId());
+        CustomerDto customer = null;
+        try {
+            customer = customerClient.getById(req.customerId());
+        } catch (FeignException.NotFound e) {
+            throw new InvalidCustomerException(req.customerId());
+        }
         if ("BLOCKED".equalsIgnoreCase(customer.status())) {
             throw new CustomerBlockedException(customer.id());
         }
@@ -44,7 +48,12 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (var itemReq : req.items()) {
-            ProductDto product = catalogClient.getById(itemReq.productId());
+            ProductDto product = null;
+            try {
+                product = catalogClient.getById(itemReq.productId());
+            } catch (FeignException.NotFound e) {
+                throw new InvalidProductException(itemReq.productId());
+            }
             if (!product.active()) {
                 throw new ProductInactiveException(product.id());
             }
