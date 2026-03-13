@@ -60,6 +60,8 @@ public class OrderServiceImpl implements OrderService {
 
             OrderItem item = new OrderItem();
             item.setProductId(product.id());
+            item.setProductSku(product.sku());
+            item.setProductName(product.name());
             item.setQuantity(itemReq.quantity());
             item.setPrice(product.price());
             order.addItem(item);
@@ -89,7 +91,8 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderResponse toResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
-                .map(i -> new OrderItemResponse(i.getId(), i.getProductId(), i.getQuantity(), i.getPrice()))
+                .map(i -> new OrderItemResponse(i.getId(), i.getProductId(), i.getProductSku(),
+                        i.getProductName(), i.getQuantity(), i.getPrice()))
                 .toList();
 
         return new OrderResponse(
