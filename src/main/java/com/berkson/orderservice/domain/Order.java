@@ -28,7 +28,7 @@ public class Order {
     private OrderStatus status = OrderStatus.CREATED;
 
     @Column(nullable = false, precision = 19, scale = 2)
-    private BigDecimal totalPrice = BigDecimal.ZERO;
+    private BigDecimal total = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
