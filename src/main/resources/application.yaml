@@ -21,3 +21,9 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
+clients:
+  customer-service:
+    url: http://localhost:8081
+  catalog-service:
+    url: http://localhost:8082
